@@ -8,7 +8,7 @@ export default function servicesWithOptions(serviceCollection, options) {
           if (typeof options === 'function') {
             defaultOptions = options(key, params, explicitOptions);
           }
-          target[key](params, Object.assign({}, defaultOptions, explicitOptions));
+          return target[key](params, Object.assign({}, defaultOptions, explicitOptions));
         };
       }
       return target[key];

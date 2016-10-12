@@ -20,18 +20,26 @@ tap.test('Client should support interception', async (t) => {
   await services.Pets.pet.findPetsByStatus({ status: 'pending' }, {
     requestInterceptor: function intercept() {
       t.ok(true, 'Should call interceptor');
+      return this;
     },
   });
   t.end();
 });
 
 tap.test('Client should support proxy', async (t) => {
-  t.plan(1);
+  t.plan(3);
   const proxied = clientConfig.servicesWithOptions(services, {
     requestInterceptor: function intercept() {
       t.ok(true, 'Should call interceptor');
+      return this;
     },
   });
-  await proxied.Pets.pet.findPetsByStatus({ status: 'pending' });
+  const res = await proxied.Pets.pet.addPet({
+    body: {
+      name: 'doggie',
+    },
+  });
+  t.strictEquals(res.status, 200, 'Should return 200');
+  t.ok(res.obj.id, 'Should have an id');
   t.end();
 });
