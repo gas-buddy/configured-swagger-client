@@ -1,7 +1,7 @@
 configured-swagger-client
 =========================
 
-GasBuddy has chosed (Swagger)[http://swagger.io/] as our API format for all internal services. Luckily, a growing number of partners
+GasBuddy has chosed [Swagger](http://swagger.io/) as our API format for all internal services. Luckily, a growing number of partners
 are also using Swagger. Our services are written mostly in Node.js, and this module is an attempt to make the process of wiring
 a Node.js project to Swagger services easier and more robust.
 
@@ -23,8 +23,8 @@ all through the logs of all of the services that request touches. This module cr
 CorrelationId along in dependent service calls.
 
 This module **requires** node 6+ because of the Proxy stuff that implements the CorrelationId capability. We use this
-with (Confit)[https://github.com/krakenjs/confit] to create service connections wholly in configuration files. This
-results in a service collection that contains (swagger-js)[https://github.com/swagger-api/swagger-js] clients.
+with [Confit](https://github.com/krakenjs/confit) to create service connections wholly in configuration files. This
+results in a service collection that contains [swagger-js](https://github.com/swagger-api/swagger-js) clients.
 
 See the tests for example usage, but here's a simple one:
 
