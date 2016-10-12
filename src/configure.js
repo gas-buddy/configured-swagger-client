@@ -26,7 +26,7 @@ function scheme(endpoints, swagger) {
  * services and return an object with the same keys as services
  * and configured swagger clients as values
  * @param {object} services The services to be created. The key should be the name of the service
- *  (the first letter of this will always be made upper case in the returned services)
+ *  (the first letter of this will always be made upper and camel cases in the returned map)
  * @param {object} endpoints Any endpoint configuration for the services. The key should match
  *  the services parameter key, and the values include hostname, port, protocol, basePath,
  *  baseReferencePath. If the value is a string, it is assumed to be the URL of the target service.
@@ -122,17 +122,20 @@ export default async function configureServices(services, endpoints = {}, option
     workToDo.push({
       client,
       url,
-      name: _.upperFirst(_.camelCase(name)),
+      name,
+      memberName: _.upperFirst(_.camelCase(name)),
     });
   }
   const clients = await Promise.all(workToDo.map(w => w.client));
   clients.forEach((c, ix) => {
-    let finalClient = c;
-    c.url = workToDo[ix].url;
+    const work = workToDo[ix];
+    // Replace the promise with the real deal
+    work.client = c;
+    c.url = work.url;
     if (options.postProcessor) {
-      finalClient = options.postProcessor(workToDo[ix].name, c) || c;
+      options.postProcessor(work);
     }
-    returnedServices[workToDo[ix].name] = finalClient;
+    returnedServices[work.memberName] = work.client;
   });
   return returnedServices;
 }
