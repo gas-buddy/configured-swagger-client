@@ -59,3 +59,23 @@ tap.test('Should work with a composite document', async (t) => {
   t.strictEquals(ret.Test.url, 'https://test:8443', 'Default host should match');
   t.end();
 });
+
+tap.test('Should pre and post process', async (t) => {
+  t.plan(7);
+  const ret = await clientConfig.configureServices({
+    'test-serv': part1,
+  }, {}, {
+    preProcessor(info) {
+      t.strictEquals(info.name, 'test-serv', 'Name should match');
+      t.strictEquals(info.memberName, 'TestServ', 'Member name should match');
+      t.strictEquals(info.config.url, 'https://test-serv:8443');
+    },
+    postProcessor(info) {
+      t.strictEquals(info.name, 'test-serv', 'Name should match');
+      t.strictEquals(info.memberName, 'TestServ', 'Member name should match');
+      t.ok(info.client, 'Should have a client');
+    },
+  });
+  t.ok(ret.TestServ, 'Client should be returned');
+  t.end();
+});

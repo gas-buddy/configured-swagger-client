@@ -35,8 +35,10 @@ function scheme(endpoints, swagger) {
  * @param {object} [options] Any options for all services
  * @param {string} options.basedir This module uses swagger-ref-resolver to resolve "enhanced"
  *  swagger documents. Any relative paths in those documents will use basedir
- * @param {function} options.postProcessor A function that will be called with the name of a
- *  service and the client itself (after it's wired up)
+ * @param {function} options.postProcessor A function that will be called with information
+ *  about the client (name, memberName, client) and the client itself (after it's wired up)
+ * @param {function} options.preProcessor A function that will be called with information
+ *  about the client that WILL BE configured - name, memberName, url and config
  */
 export default async function configureServices(services, endpoints = {}, options = {}) {
   const swaggerResourceCache = options.swaggerResources;
@@ -118,24 +120,31 @@ export default async function configureServices(services, endpoints = {}, option
       clientConfig.authorizations = clientConfig.authorizations || {};
       clientConfig.authorizations[securityScheme || 'authToken'] = authTokenScheme;
     }
-    const client = new Client(clientConfig);
-    workToDo.push({
-      client,
+
+    const workOrder = {
       url,
       name,
       memberName: _.upperFirst(_.camelCase(name)),
-    });
+      config: clientConfig,
+    };
+
+    if (options.preProcessor) {
+      await options.preProcessor(workOrder);
+    }
+    workOrder.client = new Client(workOrder.config);
+    workToDo.push(workOrder);
   }
+
   const clients = await Promise.all(workToDo.map(w => w.client));
-  clients.forEach((c, ix) => {
+  await Promise.all(clients.map(async (c, ix) => {
     const work = workToDo[ix];
     // Replace the promise with the real deal
     work.client = c;
     c.url = work.url;
     if (options.postProcessor) {
-      options.postProcessor(work);
+      await options.postProcessor(work);
     }
     returnedServices[work.memberName] = work.client;
-  });
+  }));
   return returnedServices;
 }
