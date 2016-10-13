@@ -1,3 +1,7 @@
+1.2.2
+=====
+* Don't throw an exception if you ask for a non-existent method name (just return null)
+
 1.2.1
 =====
 * Support promises properly, add test to illustrate

@@ -27,7 +27,7 @@ tap.test('Client should support interception', async (t) => {
 });
 
 tap.test('Client should support proxy', async (t) => {
-  t.plan(3);
+  t.plan(4);
   const proxied = clientConfig.servicesWithOptions(services, {
     requestInterceptor: function intercept() {
       t.ok(true, 'Should call interceptor');
@@ -41,5 +41,6 @@ tap.test('Client should support proxy', async (t) => {
   });
   t.strictEquals(res.status, 200, 'Should return 200');
   t.ok(res.obj.id, 'Should have an id');
+  t.ok(!proxied.Pets.pet.doesNotExist, 'Should return null for non-existent method');
   t.end();
 });

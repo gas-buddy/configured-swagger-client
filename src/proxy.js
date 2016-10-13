@@ -18,7 +18,7 @@ export default function servicesWithOptions(serviceCollection, options) {
   // This proxy function is used for each service
   const serviceHandler = {
     get(target, key) {
-      if (target.apis[key] === target[key]) {
+      if (target[key] && target.apis[key]) {
         return new Proxy(target[key], apiHandler);
       }
       return target[key];
