@@ -1,7 +1,7 @@
 configured-swagger-client
 =========================
 
-GasBuddy has chosed [Swagger](http://swagger.io/) as our API format for all internal services. Luckily, a growing number of partners
+GasBuddy has chosen [Swagger](http://swagger.io/) as our API format for all internal services. Luckily, a growing number of partners
 are also using Swagger. Our services are written mostly in Node.js, and this module is an attempt to make the process of wiring
 a Node.js project to Swagger services easier and more robust.
 
