@@ -135,7 +135,7 @@ export default async function configureServices(services, endpoints = {}, option
     };
 
     if (options.preProcessor) {
-      await options.preProcessor(workOrder);
+      await options.preProcessor(workOrder, configOverride);
     }
     workOrder.client = new Client(workOrder.config);
     workToDo.push(workOrder);
