@@ -20,3 +20,8 @@ is a violation of semver. Realistically, it's been like an hour, so I will unpub
 =====
 * Add CHANGELOG.md
 * Fix README.md markdown for links
+
+1.3.0
+=====
+* Add simple class to allow direct hydration from a (to-be-released) configuration layer
+* Added 'enabled' property on endpoint config that, when false, will not create the specified service client

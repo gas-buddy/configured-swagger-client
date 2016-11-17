@@ -47,6 +47,12 @@ export default async function configureServices(services, endpoints = {}, option
   for (const [name, swaggerSpec] of Object.entries(services)) {
     const configOverride = endpoints[name];
 
+    if (configOverride && 'enabled' in configOverride && !configOverride.enabled) {
+      // So damn pedantic. I decree this use to be worthy.
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
     // The value of the services key should be either a URL or a swagger specification
     // (not as a string, but as the hydrated javascript object)
     let specJson = swaggerSpec;
