@@ -58,8 +58,14 @@ export default async function configureServices(services, endpoints = {}, option
     let specJson = swaggerSpec;
     let url;
     if (typeof swaggerSpec === 'string') {
-      url = swaggerSpec;
-      specJson = undefined;
+      if (URL.parse(swaggerSpec).protocol) {
+        // Remote reference
+        url = swaggerSpec;
+        specJson = undefined;
+      } else {
+        // Local file
+        specJson = await jsonResolver(swaggerSpec, null, swaggerResourceCache);
+      }
     } else {
       // Resolve multi-document swagger clients against a configurable base path
       let refBase = options.basedir || path.resolve('.');
@@ -71,6 +77,9 @@ export default async function configureServices(services, endpoints = {}, option
       }
 
       specJson = await jsonResolver(specJson, refBase, swaggerResourceCache);
+    }
+
+    if (specJson) {
       if (typeof (configOverride) === 'string') {
         // Endpoint config is the URL of the service
         url = configOverride;
