@@ -79,3 +79,14 @@ tap.test('Should pre and post process', async (t) => {
   t.ok(ret.TestServ, 'Client should be returned');
   t.end();
 });
+
+tap.test('Should work from the root module', async (t) => {
+  const Constructor = clientConfig.default;
+  const c = new Constructor({}, {
+    specs: {
+      test: part1,
+    },
+  });
+  const final = await c.start();
+  t.ok(final.Test, 'Should create services');
+});

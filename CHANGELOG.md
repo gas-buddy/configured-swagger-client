@@ -25,3 +25,7 @@ is a violation of semver. Realistically, it's been like an hour, so I will unpub
 =====
 * Add simple class to allow direct hydration from a (to-be-released) configuration layer
 * Added 'enabled' property on endpoint config that, when false, will not create the specified service client
+
+1.4.0
+=====
+* Support chaining requestInterceptor and responseInterceptor so we don't drop handlers on the floor.

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import URL from 'url';
 import path from 'path';
 import winston from 'winston';
-import Client from 'swagger-client';
+import Client from '@gasbuddy/swagger-client';
 import jsonResolver from '@gasbuddy/swagger-ref-resolver';
 
 /**

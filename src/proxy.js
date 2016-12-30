@@ -1,3 +1,19 @@
+function chainInterceptors(defaultOptions, explicitOptions) {
+  const combined = Object.assign({}, defaultOptions, explicitOptions);
+  if (defaultOptions && explicitOptions) {
+    ['requestInterceptor', 'responseInterceptor']
+      .forEach((m) => {
+        if (defaultOptions[m] && explicitOptions[m]) {
+          combined[m] = function combinedInterceptor(...args) {
+            explicitOptions[m].apply(this, args);
+            defaultOptions[m].apply(this, args);
+          };
+        }
+      });
+  }
+  return combined;
+}
+
 export default function servicesWithOptions(serviceCollection, options) {
   // This proxy function is used for each API on each service
   const apiHandler = {
@@ -8,7 +24,7 @@ export default function servicesWithOptions(serviceCollection, options) {
           if (typeof options === 'function') {
             defaultOptions = options(key, params, explicitOptions);
           }
-          return target[key](params, Object.assign({}, defaultOptions, explicitOptions));
+          return target[key](params, chainInterceptors(defaultOptions, explicitOptions));
         };
       }
       return target[key];
