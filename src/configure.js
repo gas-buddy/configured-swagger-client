@@ -159,6 +159,7 @@ export default async function configureServices(services, endpoints = {}, option
     if (options.postProcessor) {
       await options.postProcessor(work);
     }
+    work.client.configuredServiceName = work.memberName;
     returnedServices[work.memberName] = work.client;
   }));
   return returnedServices;
