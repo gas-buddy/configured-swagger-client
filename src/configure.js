@@ -121,7 +121,7 @@ export default async function configureServices(services, endpoints = {}, option
       url,
       spec: specJson,
       usePromise: true,
-    }, swaggerOptions);
+    }, options.swaggerOptions, swaggerOptions);
     if (username) {
       const schemeName = securityScheme || 'basic';
       const passAuth = new Client.PasswordAuthorization(username, password);
