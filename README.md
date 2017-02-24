@@ -1,6 +1,8 @@
 configured-swagger-client
 =========================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/gas-buddy/configured-swagger-client.svg)](https://greenkeeper.io/)
+
 GasBuddy has chosen [Swagger](http://swagger.io/) as our API format for all internal services. Luckily, a growing number of partners
 are also using Swagger. Our services are written mostly in Node.js, and this module is an attempt to make the process of wiring
 a Node.js project to Swagger services easier and more robust.
