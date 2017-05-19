@@ -64,6 +64,7 @@ export default async function configureServices(services, endpoints = {}, option
         specJson = undefined;
       } else {
         // Local file
+        // eslint-disable-next-line no-await-in-loop
         specJson = await jsonResolver(swaggerSpec, null, swaggerResourceCache);
       }
     } else {
@@ -76,6 +77,7 @@ export default async function configureServices(services, endpoints = {}, option
         refBase = `${refBase}${path.sep}`;
       }
 
+      // eslint-disable-next-line no-await-in-loop
       specJson = await jsonResolver(specJson, refBase, swaggerResourceCache);
     }
 
@@ -144,6 +146,7 @@ export default async function configureServices(services, endpoints = {}, option
     };
 
     if (options.preProcessor) {
+      // eslint-disable-next-line no-await-in-loop
       await options.preProcessor(workOrder, configOverride);
     }
     workOrder.client = new Client(workOrder.config);
