@@ -34,7 +34,7 @@ export default function servicesWithOptions(serviceCollection, options) {
                   }
                   throw error;
                 });
-              }
+              },
             });
         };
       }

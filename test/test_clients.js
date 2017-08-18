@@ -40,7 +40,7 @@ tap.test('Client should allow convenient exception handling', async (t) => {
   t.plan(1);
   try {
     const proxied = clientConfig.servicesWithOptions(services);
-    const { status, obj } = await proxied.Pets.pet.getPetById({ petId: 2 }).expect(404);
+    const { status } = await proxied.Pets.pet.getPetById({ petId: 2 }).expect(404);
     t.strictEquals(status, 404, 'should get a 404 status');
   } catch (error) {
     t.fail('Should not throw for expected error');
