@@ -24,7 +24,18 @@ export default function servicesWithOptions(serviceCollection, options) {
           if (typeof options === 'function') {
             defaultOptions = options(key, params, explicitOptions);
           }
-          return target[key](params, chainInterceptors(defaultOptions, explicitOptions));
+          // Provide a convenience method on the promise
+          return Object.assign(
+            target[key](params, chainInterceptors(defaultOptions, explicitOptions)), {
+              expect(...codes) {
+                return this.catch((error) => {
+                  if (codes.includes(error.status)) {
+                    return error;
+                  }
+                  throw error;
+                });
+              }
+            });
         };
       }
       return target[key];
