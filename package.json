@@ -33,6 +33,7 @@
     "cross-env": "^5",
     "eslint-config-gasbuddy": "^4.0.0",
     "nock": "^9.0.2",
+    "nyc": "^11.3.0",
     "tap": "^10"
   },
   "dependencies": {
