@@ -109,6 +109,9 @@ export default async function configureServices(services, endpoints = {}, option
     if (specJson && specJson.host && configOverride && configOverride.hostname) {
       specJson.host = configOverride.hostname;
     }
+    if (specJson && specJson.schemes && configOverride && configOverride.protocol) {
+      specJson.schemes = [configOverride.protocol.replace(':', '')];
+    }
 
     winston.info('Connecting service', { name, url });
     const {
