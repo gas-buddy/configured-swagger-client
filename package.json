@@ -27,18 +27,18 @@
   "devDependencies": {
     "babel-cli": "^6.16.0",
     "babel-core": "^6.16.0",
-    "babel-eslint": "^8.1.2",
+    "babel-eslint": "^8.2.1",
     "babel-preset-gasbuddy": "^3.1.0",
     "babel-register": "^6.16.3",
     "cross-env": "^5",
-    "eslint-config-gasbuddy": "^4.0.0",
-    "nock": "^9.0.2",
+    "eslint-config-gasbuddy": "^4.1.0",
+    "nock": "^9.1.6",
     "nyc": "^11.4.1",
-    "tap": "^10"
+    "tap": "^11.0.1"
   },
   "dependencies": {
     "@gasbuddy/swagger-client": "~2.1.27",
-    "@gasbuddy/swagger-ref-resolver": "^3.0.0",
+    "@gasbuddy/swagger-ref-resolver": "^4.0.0",
     "lodash": "^4.16.4",
     "winston": "^2.2.0"
   },
