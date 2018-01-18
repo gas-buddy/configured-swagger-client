@@ -2,7 +2,7 @@ import assert from 'assert';
 import configureServices from './configure';
 
 export { configureServices };
-export { default as servicesWithOptions } from './proxy';
+export { OriginalCallPropertyKey, servicesWithOptions } from './proxy';
 
 export default class SwaggerClientConfigurator {
   constructor(context, config) {

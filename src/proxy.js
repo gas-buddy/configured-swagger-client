@@ -1,10 +1,14 @@
-function chainInterceptors(defaultOptions, explicitOptions) {
+export const OriginalCallPropertyKey =
+  Symbol('An error object that is created at original call time for a Swagger call');
+
+function chainInterceptors(defaultOptions, explicitOptions, placeholderError) {
   const combined = Object.assign({}, defaultOptions, explicitOptions);
   if (defaultOptions && explicitOptions) {
     ['requestInterceptor', 'responseInterceptor']
       .forEach((m) => {
         if (defaultOptions[m] && explicitOptions[m]) {
           combined[m] = function combinedInterceptor(...args) {
+            this[OriginalCallPropertyKey] = placeholderError;
             explicitOptions[m].apply(this, args);
             defaultOptions[m].apply(this, args);
           };
@@ -14,19 +18,22 @@ function chainInterceptors(defaultOptions, explicitOptions) {
   return combined;
 }
 
-export default function servicesWithOptions(serviceCollection, options) {
+export function servicesWithOptions(serviceCollection, options) {
   // This proxy function is used for each API on each service
   const apiHandler = {
     get(target, key) {
       if (target.apis[key]) {
-        return (params, explicitOptions) => {
+        const returnFunction = (params, explicitOptions) => {
+          const placeholderError = new Error();
+          Error.captureStackTrace(placeholderError, returnFunction);
           let defaultOptions = options;
           if (typeof options === 'function') {
             defaultOptions = options(key, params, explicitOptions);
           }
           // Provide a convenience method on the promise
+          const finalOptions = chainInterceptors(defaultOptions, explicitOptions, placeholderError);
           return Object.assign(
-            target[key](params, chainInterceptors(defaultOptions, explicitOptions)), {
+            target[key](params, finalOptions), {
               expect(...codes) {
                 return this.catch((error) => {
                   if (codes.includes(error.status)) {
@@ -37,6 +44,7 @@ export default function servicesWithOptions(serviceCollection, options) {
               },
             });
         };
+        return returnFunction;
       }
       return target[key];
     },
