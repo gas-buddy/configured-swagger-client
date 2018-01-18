@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@gasbuddy/swagger-client": "~2.1.27",
-    "@gasbuddy/swagger-ref-resolver": "^3.0.0",
+    "@gasbuddy/swagger-ref-resolver": "^4.0.0",
     "lodash": "^4.16.4",
     "winston": "^2.2.0"
   },
