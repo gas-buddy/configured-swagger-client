@@ -125,7 +125,7 @@ export default async function configureServices(services, endpoints = {}, option
       swaggerOptions,
     } = configOverride || {};
     const clientConfig = Object.assign({
-      url: specJson ? undefined : url,
+      url,
       spec: specJson,
       usePromise: true,
     }, options.swaggerOptions, swaggerOptions);
@@ -151,6 +151,10 @@ export default async function configureServices(services, endpoints = {}, option
     if (options.preProcessor) {
       // eslint-disable-next-line no-await-in-loop
       await options.preProcessor(workOrder, configOverride);
+    }
+    if (workOrder.config.spec && workOrder.config.url) {
+      // Swagger will try to fetch this doc for refs if we set it
+      delete workOrder.config.url;
     }
     workOrder.client = new Client(workOrder.config);
     workToDo.push(workOrder);
