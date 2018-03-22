@@ -94,6 +94,9 @@ export default async function configureServices(services, endpoints = {}, option
         };
         defaults.port = secScheme.startsWith('https') ? 8443 : 8000;
         url = URL.format(Object.assign({}, defaults, configOverride));
+        if (configOverride.security) {
+          specJson.security = configOverride.security;
+        }
       } else {
         // Use etcd/k8s for endpoint resolution by using the name of the service as a hostname
         const secScheme = scheme(endpoints, swaggerSpec);
@@ -122,7 +125,7 @@ export default async function configureServices(services, endpoints = {}, option
       swaggerOptions,
     } = configOverride || {};
     const clientConfig = Object.assign({
-      url,
+      url: specJson ? undefined : url,
       spec: specJson,
       usePromise: true,
     }, options.swaggerOptions, swaggerOptions);
