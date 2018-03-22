@@ -1,10 +1,13 @@
 export const OriginalCallPropertyKey =
   Symbol('An error object that is created at original call time for a Swagger call');
+export const CallPathPropertyKey =
+  Symbol('The configured service name and method used in the current call');
 
-function chainInterceptors(defaultOptions, explicitOptions, placeholderError) {
+function chainInterceptors(defaultOptions, explicitOptions, placeholderError, opInfo) {
   const combined = Object.assign({}, defaultOptions, explicitOptions);
   combined.requestInterceptor = function combinedRequestInterceptor(...args) {
     this[OriginalCallPropertyKey] = placeholderError;
+    this[CallPathPropertyKey] = opInfo;
     if (explicitOptions && explicitOptions.requestInterceptor) {
       explicitOptions.requestInterceptor.apply(this, args);
     }
@@ -34,11 +37,22 @@ export function servicesWithOptions(serviceCollection, options) {
           if (typeof options === 'function') {
             defaultOptions = options(key, params, explicitOptions);
           }
+          const opInfo = [target[CallPathPropertyKey], key];
+          const finalOptions =
+            chainInterceptors(defaultOptions, explicitOptions, placeholderError, opInfo);
+
           // Provide a convenience method on the promise
-          const finalOptions = chainInterceptors(defaultOptions, explicitOptions, placeholderError);
           return Object.assign(
             target[key](params, finalOptions), {
               expect(...codes) {
+                return this.catch((error) => {
+                  if (codes.includes(error.status)) {
+                    return error;
+                  }
+                  throw error;
+                });
+              },
+              expects(...codes) {
                 return this.catch((error) => {
                   if (codes.includes(error.status)) {
                     return error;
@@ -58,7 +72,9 @@ export function servicesWithOptions(serviceCollection, options) {
   const serviceHandler = {
     get(target, key) {
       if (typeof target[key] === 'object') {
-        return new Proxy(target[key], apiHandler);
+        const newProxy = new Proxy(target[key], apiHandler);
+        newProxy[CallPathPropertyKey] = target[CallPathPropertyKey];
+        return newProxy;
       }
       return target[key];
     },
@@ -67,10 +83,14 @@ export function servicesWithOptions(serviceCollection, options) {
   const clientHandler = {
     get(target, key) {
       if (key === 'apis') {
-        return new Proxy(target.apis, serviceHandler);
+        const newProxy = new Proxy(target.apis, serviceHandler);
+        newProxy[CallPathPropertyKey] = target[CallPathPropertyKey];
+        return newProxy;
       }
       if (typeof target.apis[key] === 'object') {
-        return new Proxy(target.apis[key], apiHandler);
+        const newProxy = new Proxy(target.apis[key], apiHandler);
+        newProxy[CallPathPropertyKey] = target[CallPathPropertyKey];
+        return newProxy;
       }
       return target[key];
     },
@@ -86,7 +106,13 @@ export function servicesWithOptions(serviceCollection, options) {
       }
       const service = target[key];
       if (service) {
-        return new Proxy(service, clientHandler);
+        // I don't think this actually has to get done every
+        // time because we're setting the prop on the REAL
+        // object, but it's so cheap that I'm leaving it simple.
+        const newProxy = new Proxy(service, clientHandler);
+        newProxy[CallPathPropertyKey] = key;
+        proxied[key] = newProxy;
+        return newProxy;
       }
       return service;
     },
