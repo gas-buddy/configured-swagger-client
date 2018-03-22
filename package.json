@@ -1,6 +1,6 @@
 {
   "name": "@gasbuddy/configured-swagger-client",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A module that creates a set of swagger clients with support for inter-service tracing, custom certificates, and separated endpoint configuration",
   "main": "build/index.js",
   "scripts": {

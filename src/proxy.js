@@ -57,7 +57,7 @@ export function servicesWithOptions(serviceCollection, options) {
   // This proxy function is used for each service
   const serviceHandler = {
     get(target, key) {
-      if (target[key]) {
+      if (typeof target[key] === 'object') {
         return new Proxy(target[key], apiHandler);
       }
       return target[key];
@@ -69,7 +69,7 @@ export function servicesWithOptions(serviceCollection, options) {
       if (key === 'apis') {
         return new Proxy(target.apis, serviceHandler);
       }
-      if (target.apis[key]) {
+      if (typeof target.apis[key] === 'object') {
         return new Proxy(target.apis[key], apiHandler);
       }
       return target[key];
