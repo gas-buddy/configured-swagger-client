@@ -3,17 +3,21 @@ export const OriginalCallPropertyKey =
 
 function chainInterceptors(defaultOptions, explicitOptions, placeholderError) {
   const combined = Object.assign({}, defaultOptions, explicitOptions);
-  if (defaultOptions && explicitOptions) {
-    ['requestInterceptor', 'responseInterceptor']
-      .forEach((m) => {
-        if (defaultOptions[m] && explicitOptions[m]) {
-          combined[m] = function combinedInterceptor(...args) {
-            this[OriginalCallPropertyKey] = placeholderError;
-            explicitOptions[m].apply(this, args);
-            defaultOptions[m].apply(this, args);
-          };
-        }
-      });
+  combined.requestInterceptor = function combinedRequestInterceptor(...args) {
+    this[OriginalCallPropertyKey] = placeholderError;
+    if (explicitOptions && explicitOptions.requestInterceptor) {
+      explicitOptions.requestInterceptor.apply(this, args);
+    }
+    if (defaultOptions && defaultOptions.requestInterceptor) {
+      defaultOptions.requestInterceptor.apply(this, args);
+    }
+  };
+  if (defaultOptions && explicitOptions &&
+    defaultOptions.responseInterceptor && explicitOptions.responseInterceptor) {
+    combined.responseInterceptor = function combinedResponseInterceptor(...args) {
+      explicitOptions.responseInterceptor.apply(this, args);
+      defaultOptions.responseInterceptor.apply(this, args);
+    };
   }
   return combined;
 }

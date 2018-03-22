@@ -29,3 +29,15 @@ is a violation of semver. Realistically, it's been like an hour, so I will unpub
 1.4.0
 =====
 * Support chaining requestInterceptor and responseInterceptor so we don't drop handlers on the floor.
+
+2.0.0
+=====
+* Supports node 8 only
+
+2.2.0
+=====
+* Add a symbol and a property using that symbol to the objects passed as "this" to request/response interceptors. The value of this property is an Error object whose stack was captured at the BEGINNING of the Swagger request, which often makes a more meaningful trace.
+
+2.3.1
+=====
+* Fix error symbol when options are not passed (meaning, like all the time)
