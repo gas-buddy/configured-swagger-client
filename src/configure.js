@@ -2,7 +2,7 @@ import _ from 'lodash';
 import URL from 'url';
 import path from 'path';
 import winston from 'winston';
-import Client from '@gasbuddy/swagger-client';
+import Client from 'swagger-client';
 import jsonResolver from '@gasbuddy/swagger-ref-resolver';
 
 /**
@@ -117,7 +117,6 @@ export default async function configureServices(services, endpoints = {}, option
     const {
       username,
       authToken,
-      authTokenLocation = 'header',
       securityScheme,
       password,
       swaggerOptions,
@@ -129,16 +128,14 @@ export default async function configureServices(services, endpoints = {}, option
     }, options.swaggerOptions, swaggerOptions);
     if (username) {
       const schemeName = securityScheme || 'basic';
-      const passAuth = new Client.PasswordAuthorization(username, password);
       clientConfig.authorizations = {
-        [schemeName]: passAuth,
+        [schemeName]: { username, password },
       };
     } else if (authToken) {
-      const authTokenScheme = new Client.ApiKeyAuthorization('Authorization',
-        `Bearer ${authToken}`,
-        authTokenLocation);
       clientConfig.authorizations = clientConfig.authorizations || {};
-      clientConfig.authorizations[securityScheme || 'authToken'] = authTokenScheme;
+      clientConfig.authorizations[securityScheme || 'authToken'] = {
+        token: { access_token: authToken, token_type: 'Bearer' },
+      };
     }
 
     const workOrder = {

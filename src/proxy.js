@@ -26,7 +26,7 @@ export function servicesWithOptions(serviceCollection, options) {
   // This proxy function is used for each API on each service
   const apiHandler = {
     get(target, key) {
-      if (target.apis[key]) {
+      if (target[key]) {
         const returnFunction = (params, explicitOptions) => {
           const placeholderError = new Error();
           Error.captureStackTrace(placeholderError, returnFunction);
@@ -57,8 +57,20 @@ export function servicesWithOptions(serviceCollection, options) {
   // This proxy function is used for each service
   const serviceHandler = {
     get(target, key) {
-      if (target[key] && target.apis[key]) {
+      if (target[key]) {
         return new Proxy(target[key], apiHandler);
+      }
+      return target[key];
+    },
+  };
+
+  const clientHandler = {
+    get(target, key) {
+      if (key === 'apis') {
+        return new Proxy(target.apis, serviceHandler);
+      }
+      if (target.apis[key]) {
+        return new Proxy(target.apis[key], apiHandler);
       }
       return target[key];
     },
@@ -74,7 +86,7 @@ export function servicesWithOptions(serviceCollection, options) {
       }
       const service = target[key];
       if (service) {
-        return new Proxy(service, serviceHandler);
+        return new Proxy(service, clientHandler);
       }
       return service;
     },
