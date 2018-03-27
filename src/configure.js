@@ -170,6 +170,16 @@ export default async function configureServices(services, endpoints = {}, option
       await options.postProcessor(work);
     }
     work.client.configuredServiceName = work.memberName;
+    for (const api of Object.keys(work.client.apis)) {
+      for (const method of Object.keys(api)) {
+        const v2method = method.replace(/((_){2,})/g, '_')
+          .replace(/^(_)*/g, '')
+          .replace(/([_])*$/g, '');
+        if (v2method !== method) {
+          api[v2method] = api[method];
+        }
+      }
+    }
     returnedServices[work.memberName] = work.client;
   }));
   return returnedServices;
