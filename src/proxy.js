@@ -47,7 +47,13 @@ export function servicesWithOptions(serviceCollection, options) {
               expect(...codes) {
                 return this.catch((error) => {
                   if (codes.includes(error.status)) {
-                    return error;
+                    return {
+                      errObj: error,
+                      response: error.response,
+                      status: error.status,
+                      statusCode: error.statusCode,
+                      body: error.response && error.response.body,
+                    };
                   }
                   throw error;
                 });
@@ -55,7 +61,13 @@ export function servicesWithOptions(serviceCollection, options) {
               expects(...codes) {
                 return this.catch((error) => {
                   if (codes.includes(error.status)) {
-                    return error;
+                    return {
+                      errObj: error,
+                      response: error.response,
+                      status: error.status,
+                      statusCode: error.statusCode,
+                      body: error.response && error.response.body,
+                    };
                   }
                   throw error;
                 });
