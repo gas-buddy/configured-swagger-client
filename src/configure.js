@@ -116,6 +116,15 @@ export default async function configureServices(services, endpoints = {}, option
       specJson.schemes = [configOverride.protocol.replace(':', '')];
     }
 
+    if (specJson) {
+      if (configOverride && configOverride.requestContentType) {
+        specJson.consumes = [configOverride.requestContentType];
+      } else if (!specJson.consumes || !specJson.consumes.length) {
+        winston.warn('Missing "consumes" property on service, assuming application/json', { name });
+        specJson.consumes = ['application/json'];
+      }
+    }
+
     winston.info('Connecting service', { name, url });
     const {
       username,
