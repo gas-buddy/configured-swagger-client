@@ -155,6 +155,7 @@ export default async function configureServices(services, endpoints = {}, option
       name,
       memberName: _.upperFirst(_.camelCase(name)),
       config: clientConfig,
+      endpoint: configOverride,
     };
 
     if (options.preProcessor) {
