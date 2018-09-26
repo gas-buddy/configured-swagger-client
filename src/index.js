@@ -6,7 +6,11 @@ export { OriginalCallPropertyKey, CallPathPropertyKey, servicesWithOptions } fro
 
 export default class SwaggerClientConfigurator {
   constructor(context, config) {
-    this.promise = configureServices(config.specs, config.endpoints, config.options);
+    this.promise = configureServices(
+      config.specs,
+      config.endpoints,
+      config.options,
+      context.logger);
   }
 
   async start() {

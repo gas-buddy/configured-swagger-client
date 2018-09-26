@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import URL from 'url';
 import path from 'path';
-import winston from 'winston';
 import Client from 'swagger-client';
 import jsonResolver from '@gasbuddy/swagger-ref-resolver';
 
@@ -40,7 +39,8 @@ function scheme(endpoints, swagger) {
  * @param {function} options.preProcessor A function that will be called with information
  *  about the client that WILL BE configured - name, memberName, url and config
  */
-export default async function configureServices(services, endpoints = {}, options = {}) {
+export default async function
+configureServices(services, endpoints = {}, options = {}, logger = console) {
   const swaggerResourceCache = options.swaggerResources;
   const returnedServices = {};
   const workToDo = [];
@@ -120,12 +120,12 @@ export default async function configureServices(services, endpoints = {}, option
       if (configOverride && configOverride.requestContentType) {
         specJson.consumes = [configOverride.requestContentType];
       } else if (!specJson.consumes || !specJson.consumes.length) {
-        winston.warn('Missing "consumes" property on service, assuming application/json', { name });
+        logger.warn('Missing "consumes" property on service, assuming application/json', { name });
         specJson.consumes = ['application/json'];
       }
     }
 
-    winston.info('Connecting service', { name, url });
+    logger.info('Connecting service', { name, url });
     const {
       username,
       authToken,
