@@ -1,10 +1,10 @@
 {
   "name": "@gasbuddy/configured-swagger-client",
-  "version": "3.3.0",
+  "version": "4.0.0",
   "description": "A module that creates a set of swagger clients with support for inter-service tracing, custom certificates, and separated endpoint configuration",
   "main": "build/index.js",
   "scripts": {
-    "test": "tap --node-arg=-r --node-arg=babel-register test/*.js",
+    "test": "tap --node-arg=-r --node-arg=@babel/register test/*.js",
     "cover": "cross-env BABEL_ENV=test nyc tap test/test_*.js && nyc check-coverage && nyc report --reporter=text",
     "ci-test": "cross-env NODE_ENV=test nyc tap -Rtap test/test_*.js | tee .tap_output | tap -Rspec -",
     "ci-cover": "nyc check-coverage",
@@ -25,18 +25,17 @@
     "node": "^8"
   },
   "devDependencies": {
-    "babel-cli": "^6.16.0",
-    "babel-core": "^6.26.3",
-    "babel-preset-gasbuddy": "^3.3.3",
-    "babel-register": "^6.16.3",
+    "@babel/cli": "^7.1.2",
+    "@babel/register": "^7.0.0",
+    "babel-preset-gasbuddy": "^4.1.0",
     "cross-env": "^5.2.0",
-    "eslint-config-gasbuddy": "^4.1.0",
-    "nock": "^9.6.1",
-    "nyc": "^11.9.0",
-    "tap": "^11.1.5"
+    "eslint-config-gasbuddy": "^5.0.2",
+    "nock": "^10.0.1",
+    "nyc": "^13.1.0",
+    "tap": "^12.0.1"
   },
   "dependencies": {
-    "@gasbuddy/swagger-ref-resolver": "^4.3.0",
+    "@gasbuddy/swagger-ref-resolver": "^5.0.0",
     "lodash": "^4.17.11",
     "swagger-client": "^3.8.21"
   },
@@ -49,7 +48,7 @@
       "src"
     ],
     "require": [
-      "babel-register"
+      "@babel/register"
     ],
     "sourceMap": false,
     "instrument": false,

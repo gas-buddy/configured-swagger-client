@@ -10,12 +10,13 @@ export default class SwaggerClientConfigurator {
       config.specs,
       config.endpoints,
       config.options,
-      context.logger);
+      context.logger,
+    );
   }
 
   async start() {
     assert(this.promise, 'start called multiple times on configured-postgres-client instance');
-    const promise = this.promise;
+    const { promise } = this;
     delete this.promise;
     return promise;
   }

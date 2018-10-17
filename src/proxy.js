@@ -1,7 +1,5 @@
-export const OriginalCallPropertyKey =
-  Symbol('An error object that is created at original call time for a Swagger call');
-export const CallPathPropertyKey =
-  Symbol('The configured service name and method used in the current call');
+export const OriginalCallPropertyKey = Symbol('An error object that is created at original call time for a Swagger call');
+export const CallPathPropertyKey = Symbol('The configured service name and method used in the current call');
 
 function chainInterceptors(defaultOptions, explicitOptions, placeholderError, opInfo) {
   const combined = Object.assign({}, defaultOptions, explicitOptions);
@@ -15,8 +13,9 @@ function chainInterceptors(defaultOptions, explicitOptions, placeholderError, op
       defaultOptions.requestInterceptor.apply(this, args);
     }
   };
-  if (defaultOptions && explicitOptions &&
-    defaultOptions.responseInterceptor && explicitOptions.responseInterceptor) {
+  if (defaultOptions && explicitOptions
+    && defaultOptions.responseInterceptor
+    && explicitOptions.responseInterceptor) {
     combined.responseInterceptor = function combinedResponseInterceptor(...args) {
       explicitOptions.responseInterceptor.apply(this, args);
       defaultOptions.responseInterceptor.apply(this, args);
@@ -38,8 +37,12 @@ export function servicesWithOptions(serviceCollection, options) {
             defaultOptions = options(key, params, explicitOptions);
           }
           const opInfo = [target[CallPathPropertyKey], key];
-          const finalOptions =
-            chainInterceptors(defaultOptions, explicitOptions, placeholderError, opInfo);
+          const finalOptions = chainInterceptors(
+            defaultOptions,
+            explicitOptions,
+            placeholderError,
+            opInfo,
+          );
 
           // Provide a convenience method on the promise
           return Object.assign(
@@ -72,7 +75,8 @@ export function servicesWithOptions(serviceCollection, options) {
                   throw error;
                 });
               },
-            });
+            },
+          );
         };
         return returnFunction;
       }
