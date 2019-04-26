@@ -1,6 +1,9 @@
 configured-swagger-client
 =========================
 
+[![wercker status](https://app.wercker.com/status/15fcfccb064836e35c8438135e37cd41/s/master "wercker status")](https://app.wercker.com/project/byKey/15fcfccb064836e35c8438135e37cd41)
+
+
 GasBuddy has chosen [Swagger](http://swagger.io/) as our API format for all services. Luckily, a growing number of
 partners are also using Swagger. Our services are written mostly in Node.js, and this module is an attempt to make the
 process of wiring a Node.js project to Swagger services easier and more robust.
