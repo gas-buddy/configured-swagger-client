@@ -4,11 +4,8 @@
   "description": "A module that creates a set of swagger clients with support for inter-service tracing, custom certificates, and separated endpoint configuration",
   "main": "build/index.js",
   "scripts": {
-    "test": "tap --node-arg=-r --node-arg=@babel/register test/*.js",
-    "cover": "cross-env BABEL_ENV=test nyc tap test/test_*.js && nyc check-coverage && nyc report --reporter=text",
-    "ci-test": "cross-env NODE_ENV=test nyc tap -Rtap test/test_*.js | tee .tap_output | tap -Rspec -",
-    "ci-cover": "nyc check-coverage",
-    "ci-coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "test": "tap --node-arg=-r --node-arg=@babel/register --no-coverage test/*.js",
+    "ci-test": "tap test/*.js",
     "lint": "eslint .",
     "build": "babel src --out-dir build",
     "prepublish": "npm run build"
@@ -31,7 +28,6 @@
     "cross-env": "^5.2.0",
     "eslint-config-gasbuddy": "^5.2.1",
     "nock": "^10.0.6",
-    "nyc": "^14.0.0",
     "rest-api-support": "^1.0.1",
     "tap": "^13.0.3"
   },
@@ -51,8 +47,7 @@
     "require": [
       "@babel/register"
     ],
-    "sourceMap": false,
-    "instrument": false,
+    "sourceMap": true,
     "reporter": [
       "text",
       "lcov"

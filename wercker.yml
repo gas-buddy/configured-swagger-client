@@ -12,7 +12,6 @@ build:
       name: test with coverage
       code: |
         npm run --silent ci-test
-        npm run --silent ci-cover
 
     - script:
       name: build

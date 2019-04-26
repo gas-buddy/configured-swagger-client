@@ -18,6 +18,12 @@ const client = new Client({ service }, {
   },
 });
 
+class DerivativeApi extends FeatureApi {
+  constructor(config) {
+    super(config(DerivativeApi));
+  }
+}
+
 service.serviceFactory = client.start({ service });
 service.name = 'test-serv';
 const featureApi = new FeatureApi(service.serviceFactory);
@@ -71,5 +77,37 @@ tap.test('test_clients', async (tester) => {
     }).expect(404);
     t.ok(true, 'Should not throw for expected error');
     t.strictEquals(status, 404, 'Should return 404');
+  });
+
+  tester.test('Incorrect service factory should throw', (t) => {
+    t.throws(() => new DerivativeApi(service.serviceFactory), 'Unknown service should throw');
+    t.end();
+  });
+
+  tester.test('HTTPS should work with logging', async (t) => {
+    const secureClientLogger = new Client({ service }, {
+      clients: {
+        'feature-api': FeatureApi,
+      },
+      endpoints: {
+        'feature-api': {
+          protocol: 'https',
+          log: true,
+        },
+      },
+    });
+    service.serviceFactory = secureClientLogger.start({ service });
+    const secureApi = new FeatureApi(service.serviceFactory);
+
+    nock('https://feature-api:8443')
+      .post('/feature/features/foobar', { app: { id: 'GasBuddy' } })
+      .reply(200, {});
+
+    const response = await secureApi.getFeatures({
+      tag: 'foobar',
+      client: fakeRequest,
+    });
+
+    t.strictEquals(response.status, 200, 'Should get a 200');
   });
 });
