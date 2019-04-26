@@ -28,7 +28,7 @@ function serviceFactory(swaggerConfigurator, req) {
         source[CALLINFO] = {
           client: clientClass,
           serviceName,
-          operationName: `${source.client}_${source.method}`,
+          operationName: source.method,
           request,
         };
         request.headers = request.headers || {};
