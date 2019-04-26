@@ -5,6 +5,7 @@ import { EventEmitter } from 'events';
 const { fetch } = fetchPonyfill();
 
 const CALLINFO = Symbol('Swagger call info key');
+const logEverything = !!process.env.LOG_SWAGGER_CALLS;
 
 function serviceFactory(swaggerConfigurator, req) {
   const { config } = swaggerConfigurator;
@@ -18,6 +19,8 @@ function serviceFactory(swaggerConfigurator, req) {
       err.client = clientClass;
       throw err;
     }
+    const { basePath = '', hostname = serviceName, port, protocol = 'https', noTracing, log } = config.endpoints[serviceName] || {};
+    let newSpanLogger;
     const clientConfig = {
       fetch,
       EventSource,
@@ -28,12 +31,30 @@ function serviceFactory(swaggerConfigurator, req) {
           operationName: `${source.client}_${source.method}`,
         };
         request.headers = request.headers || {};
-        request.headers.correlationid = req.headers.correlationid;
+        if (!noTracing) {
+          request.headers.correlationid = req.headers?.correlationid;
+          newSpanLogger = req.gb?.logger?.loggerWithNewSpan?.();
+          request.headers.span = newSpanLogger?.spanId;
+        }
+        if ((log || logEverything) && req.gb?.logger) {
+          req.gb.logger.info('api-req', {
+            url: request.url,
+            m: request.method,
+            childSp: newSpanLogger?.spanId,
+          });
+        }
         swaggerConfigurator.emit('start', source[CALLINFO]);
       },
       responseInterceptor(response, request, source) {
         const { status } = response;
         source[CALLINFO].status = status;
+        if ((log || logEverything) && req.gb?.logger) {
+          req.gb.logger.info('api-res', {
+            s: response.status,
+            l: response.headers['content-length'] || 0,
+            childSp: newSpanLogger?.spanId,
+          });
+        }
         if (status >= 200 && status <= 300) {
           swaggerConfigurator.emit('finish', source[CALLINFO]);
         } else {
@@ -41,7 +62,6 @@ function serviceFactory(swaggerConfigurator, req) {
         }
       },
     };
-    const { basePath = '', hostname = serviceName, port, protocol = 'https' } = config.endpoints[serviceName] || {};
     const finalPort = port || (protocol.startsWith('https') ? 8443 : 8000);
     clientConfig.baseUrl = `${protocol}${protocol.endsWith(':') ? '//' : '://'}${hostname}:${finalPort}${basePath}`;
     return clientConfig;
