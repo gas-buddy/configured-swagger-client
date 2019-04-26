@@ -1,8 +1,6 @@
-import fetchPonyfill from 'fetch-ponyfill';
+import defaultFetch from 'node-fetch';
 import EventSource from 'eventsource';
 import { EventEmitter } from 'events';
-
-const { fetch } = fetchPonyfill();
 
 const CALLINFO = Symbol('Swagger call info key');
 const logEverything = !!process.env.LOG_SWAGGER_CALLS;
@@ -22,7 +20,7 @@ function serviceFactory(swaggerConfigurator, req) {
     const { basePath = '', hostname = serviceName, port, protocol = 'https', noTracing, log } = config.endpoints[serviceName] || {};
     let newSpanLogger;
     const clientConfig = {
-      fetch,
+      fetch: config.fetch,
       EventSource,
       requestInterceptor(request, source) {
         source[CALLINFO] = {
@@ -72,7 +70,10 @@ function serviceFactory(swaggerConfigurator, req) {
 export default class SwaggerClientConfigurator extends EventEmitter {
   constructor(context, config) {
     super();
-    this.config = config;
+    this.config = {
+      fetch: defaultFetch,
+      ...config,
+    };
     context.service.on('request', (req) => {
       req.gb.serviceFactory = serviceFactory(this, req);
     });
