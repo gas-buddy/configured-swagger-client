@@ -1,6 +1,6 @@
 {
   "name": "@gasbuddy/configured-swagger-client",
-  "version": "4.0.0",
+  "version": "5.0.0-alpha",
   "description": "A module that creates a set of swagger clients with support for inter-service tracing, custom certificates, and separated endpoint configuration",
   "main": "build/index.js",
   "scripts": {
@@ -25,19 +25,20 @@
     "node": "^8"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.2",
-    "@babel/register": "^7.0.0",
-    "babel-preset-gasbuddy": "^4.1.0",
+    "@babel/cli": "^7.4.3",
+    "@babel/register": "^7.4.0",
+    "babel-preset-gasbuddy": "^5.4.0",
     "cross-env": "^5.2.0",
-    "eslint-config-gasbuddy": "^5.0.2",
-    "nock": "^10.0.1",
-    "nyc": "^13.1.0",
-    "tap": "^12.0.1"
+    "eslint-config-gasbuddy": "^5.2.1",
+    "nock": "^10.0.6",
+    "nyc": "^14.0.0",
+    "rest-api-support": "^1.0.1",
+    "tap": "^13.0.1"
   },
   "dependencies": {
-    "@gasbuddy/swagger-ref-resolver": "^5.0.0",
-    "lodash": "^4.17.11",
-    "swagger-client": "^3.8.21"
+    "eventsource": "^1.0.7",
+    "fetch-ponyfill": "^6.0.2",
+    "lodash": "^4.17.11"
   },
   "nyc": {
     "lines": 75,

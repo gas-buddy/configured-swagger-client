@@ -1,74 +1,75 @@
 import tap from 'tap';
 import nock from 'nock';
-import * as clientConfig from '../src/index';
+import { EventEmitter } from 'events';
+import Client from '../src/index';
+import FeatureApi from './swagger';
 
-let services;
+const service = new EventEmitter();
 
-const basePetstoreUrl = 'http://petstore.swagger.io';
-const swaggerPath = '/v2/swagger.json';
+const client = new Client({ service }, {
+  clients: {
+    'feature-api': FeatureApi,
+  },
+  endpoints: {
+    'feature-api': {
+      protocol: 'http',
+      port: 1234,
+    },
+  },
+});
 
+service.serviceFactory = client.start({ service });
+service.name = 'test-serv';
+const featureApi = new FeatureApi(service.serviceFactory);
 
-function nockGetPet(petId) {
-  nock(basePetstoreUrl)
-    .get(`/v2/pet/${petId}`)
-    .reply(200, {
-      id: petId,
+const fakeRequest = { app: { id: 'GasBuddy' } };
+
+tap.test('test_clients', async (tester) => {
+  tester.test('simple call', async (t) => {
+    nock('http://feature-api:1234')
+      .post('/feature/features/foobar', { app: { id: 'GasBuddy' } })
+      .reply(200, {});
+
+    const response = await featureApi.getFeatures({
+      tag: 'foobar',
+      client: fakeRequest,
     });
-}
-
-tap.test('Client should work', async (t) => {
-  nock(basePetstoreUrl)
-    .get(swaggerPath)
-    .reply(200,
-      // eslint-disable-next-line global-require
-      require('./data/petswagger.json'));
-
-  nockGetPet(1);
-
-  services = await clientConfig.configureServices({
-    pets: `${basePetstoreUrl}${swaggerPath}`,
+    t.strictEquals(response.status, 200, 'Should find pets');
+    t.ok(response.body, 'Should return a body');
   });
-  const pets = await services.Pets.apis.pet.getPetById({ petId: 1 });
-  t.strictEquals(pets.status, 200, 'Should find pets');
-  t.ok(pets.obj, 'Should return an obj');
-});
 
-tap.test('Client should support interception', async (t) => {
-  t.plan(1);
-  nockGetPet(1);
-  await services.Pets.apis.pet.getPetById({ petId: 1 }, {
-    requestInterceptor: function intercept() {
-      t.ok(true, 'Should call interceptor');
-      return this;
-    },
+  tester.test('interception', async (t) => {
+    t.plan(2);
+    nock('http://feature-api:1234')
+      .post('/feature/features/foobar', { app: { id: 'GasBuddy' } })
+      .reply(200, {});
+    await featureApi.getFeatures({
+      tag: 'foobar',
+      client: fakeRequest,
+    }, {
+      requestInterceptor() {
+        t.ok(true, 'Should call request interceptor');
+      },
+      responseInterceptor() {
+        t.ok(true, 'Should call response interceptor');
+      },
+    });
   });
-});
 
-tap.test('Client should support proxy', async (t) => {
-  t.plan(4);
-  nockGetPet(1);
-  const proxied = clientConfig.servicesWithOptions(services, {
-    requestInterceptor: function intercept() {
-      t.ok(true, 'Should call interceptor');
-      return this;
-    },
+  tester.test('exception handling should work', async (t) => {
+    nock('http://feature-api:1234')
+      .post('/feature/features/baz', { app: { id: 'GasBuddy' } })
+      .reply(404, {});
+
+    t.plan(3);
+    client.once('error', () => {
+      t.ok('Should call error event handler');
+    });
+    const { status } = await featureApi.getFeatures({
+      tag: 'baz',
+      client: fakeRequest,
+    }).expect(404);
+    t.ok(true, 'Should not throw for expected error');
+    t.strictEquals(status, 404, 'Should return 404');
   });
-  const res = await proxied.Pets.pet.getPetById({ petId: 1 });
-  t.strictEquals(res.status, 200, 'Should return 200');
-  t.ok(res.obj.id, 'Should have an id');
-  t.ok(!proxied.Pets.apis.pet.doesNotExist, 'Should return null for non-existent method');
-});
-
-tap.test('Client should allow convenient exception handling', async (t) => {
-  t.plan(1);
-  try {
-    nock(basePetstoreUrl)
-      .get('/v2/pet/2')
-      .reply(404);
-    const proxied = clientConfig.servicesWithOptions(services);
-    const { status } = await proxied.Pets.apis.pet.getPetById({ petId: 2 }).expect(404);
-    t.strictEquals(status, 404, 'should get a 404 status');
-  } catch (error) {
-    t.fail('Should not throw for expected error');
-  }
 });
