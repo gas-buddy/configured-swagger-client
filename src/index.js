@@ -29,6 +29,7 @@ function serviceFactory(swaggerConfigurator, req) {
           client: clientClass,
           serviceName,
           operationName: `${source.client}_${source.method}`,
+          request,
         };
         request.headers = request.headers || {};
         if (!noTracing) {
