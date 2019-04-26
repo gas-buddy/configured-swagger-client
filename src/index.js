@@ -11,7 +11,7 @@ function serviceFactory(swaggerConfigurator, req) {
   return (clientClass) => {
     // Our job is to build the configuration for the client.
     // First, find out which client this is.
-    const [serviceName] = Object.entries(config.clients).find(([, client]) => client === clientClass) || [];
+    const [serviceName] = Object.entries(config.clients).find(([, client]) => (client === clientClass || client === clientClass?.default)) || [];
     // If we don't know, throw an error
     if (!serviceName) {
       const err = new Error('Unknown service called');
@@ -22,7 +22,11 @@ function serviceFactory(swaggerConfigurator, req) {
       fetch,
       EventSource,
       requestInterceptor(request, source) {
-        source[CALLINFO] = { operationName: `${source.client}_${source.method}` };
+        source[CALLINFO] = {
+          client: clientClass,
+          serviceName,
+          operationName: `${source.client}_${source.method}`,
+        };
         request.headers = request.headers || {};
         request.headers.correlationid = req.headers.correlationid;
         swaggerConfigurator.emit('start', source[CALLINFO]);
