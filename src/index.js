@@ -48,7 +48,7 @@ function serviceFactory(swaggerConfigurator, req) {
       },
       responseInterceptor(response, request, source) {
         const { status } = response;
-        source[CALLINFO].status = status;
+        source[CALLINFO].response = response;
         if ((log || logEverything) && req.gb?.logger) {
           req.gb.logger.info('api-res', {
             s: response.status,
@@ -79,10 +79,13 @@ export default class SwaggerClientConfigurator extends EventEmitter {
   }
 
   start(context) {
-    return serviceFactory(this, {
+    const globalFactory = serviceFactory(this, {
       headers: {
         correlationid: `${context.service.name}-global`,
       },
     });
+    // Provide to the event emitter methods to the containing service
+    globalFactory.events = this;
+    return globalFactory;
   }
 }
