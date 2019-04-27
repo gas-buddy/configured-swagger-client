@@ -5,12 +5,20 @@ import { EventEmitter } from 'events';
 const CALLINFO = Symbol('Swagger call info key');
 const logEverything = !!process.env.LOG_SWAGGER_CALLS;
 
+function findServiceName(clientClass, clients) {
+  const matchedEntry = Object.entries(clients)
+    .find(([, client]) => (client?.default === clientClass || client === clientClass))
+    || Object.entries(clients)
+      .find(([, client]) => (client?.default?.name === clientClass.name || client.name === clientClass.name));
+  return matchedEntry?.[0];
+}
+
 function serviceFactory(swaggerConfigurator, req) {
   const { config } = swaggerConfigurator;
   return (clientClass) => {
     // Our job is to build the configuration for the client.
     // First, find out which client this is.
-    const [serviceName] = Object.entries(config.clients).find(([, client]) => (client === clientClass || client === clientClass?.default)) || [];
+    const serviceName = findServiceName(clientClass, config.clients);
     // If we don't know, throw an error
     if (!serviceName) {
       const err = new Error('Unknown service called');
