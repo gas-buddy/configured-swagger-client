@@ -51,7 +51,7 @@ Migration:
 * There are no more tag names in swagger specs currently, so that's a big change
 * Instead of `req.gb.services.FooServ.default.method_name()` it is now:
 ```
-const fooServ = new FooServ(req.gb.serviceFactory);
+const fooServ = new FooServ(req);
 fooServ.method_name();
 ```
 * In your config.json(s), change "services" to "serviceFactory", and change "specs" to "clients", and then update all the package names to point to the generated-code version (e.g. feature-api-spec becomes feature-api-js-client)

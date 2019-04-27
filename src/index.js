@@ -2,6 +2,7 @@ import defaultFetch from 'node-fetch';
 import EventSource from 'eventsource';
 import { EventEmitter } from 'events';
 
+const CONFIG_FUNCTION = Symbol.for('small-swagger-codegen::configurationGenerator');
 const CALLINFO = Symbol('Swagger call info key');
 const logEverything = !!process.env.LOG_SWAGGER_CALLS;
 
@@ -83,7 +84,9 @@ export default class SwaggerClientConfigurator extends EventEmitter {
       ...config,
     };
     context.service.on('request', (req) => {
-      req.gb.serviceFactory = serviceFactory(this, req);
+      const factory = serviceFactory(this, req);
+      req[CONFIG_FUNCTION] = factory;
+      req.gb.serviceFactory = factory;
     });
   }
 
@@ -95,6 +98,7 @@ export default class SwaggerClientConfigurator extends EventEmitter {
     });
     // Provide to the event emitter methods to the containing service
     globalFactory.events = this;
+    context.service[CONFIG_FUNCTION] = globalFactory;
     return globalFactory;
   }
 }
