@@ -26,7 +26,7 @@ function serviceFactory(swaggerConfigurator, req) {
       err.client = clientClass;
       throw err;
     }
-    const { basePath = '', hostname = serviceName, port, protocol = 'https', noTracing, log } = config.endpoints[serviceName] || {};
+    const { basePath = '', hostname = serviceName, port, protocol = 'https', noTracing, log, username, password, authToken } = config.endpoints[serviceName] || {};
     let newSpanLogger;
     const clientConfig = {
       fetch: config.fetch,
@@ -50,6 +50,12 @@ function serviceFactory(swaggerConfigurator, req) {
             m: request.method,
             childSp: newSpanLogger?.spanId,
           });
+        }
+        if (username) {
+          const based = Buffer.from(`${username}:${password}`).toString('base64');
+          request.headers.authorization = `Basic ${based}`;
+        } else if (authToken) {
+          request.headers.authorization = `Bearer ${authToken}`;
         }
         swaggerConfigurator.emit('start', source[CALLINFO]);
       },
