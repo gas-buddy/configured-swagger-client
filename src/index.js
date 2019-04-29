@@ -76,8 +76,10 @@ function serviceFactory(swaggerConfigurator, req) {
         }
       },
     };
-    const finalPort = port || (protocol.startsWith('https') ? 8443 : 8000);
-    clientConfig.baseUrl = `${protocol}${protocol.endsWith(':') ? '//' : '://'}${hostname}:${finalPort}${basePath}`;
+    const isHttps = protocol.toLowerCase().startsWith('https');
+    const finalPort = Number(port || (isHttps ? 8443 : 8000));
+    const portString = ((isHttps && finalPort === 443) || (!isHttps && finalPort === 80)) ? '' : `:${finalPort}`;
+    clientConfig.baseUrl = `${protocol}${protocol.endsWith(':') ? '//' : '://'}${hostname}${portString}${basePath}`;
     return clientConfig;
   };
 }
