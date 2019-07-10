@@ -32,6 +32,7 @@ function serviceFactory(swaggerConfigurator, req) {
     const clientConfig = {
       fetch: config.fetch,
       EventSource,
+      FormData,
       requestInterceptor(request, source) {
         source[CALLINFO] = {
           client: clientClass,
@@ -90,7 +91,6 @@ export default class SwaggerClientConfigurator extends EventEmitter {
     super();
     this.config = {
       fetch: defaultFetch,
-      FormData,
       ...config,
     };
     context.service.on('request', (req) => {
