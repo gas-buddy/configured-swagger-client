@@ -1,4 +1,5 @@
 import defaultFetch from 'node-fetch';
+import FormData from 'form-data';
 import EventSource from 'eventsource';
 import { EventEmitter } from 'events';
 
@@ -89,6 +90,7 @@ export default class SwaggerClientConfigurator extends EventEmitter {
     super();
     this.config = {
       fetch: defaultFetch,
+      FormData,
       ...config,
     };
     context.service.on('request', (req) => {
