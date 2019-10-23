@@ -77,6 +77,14 @@ function serviceFactory(swaggerConfigurator, req) {
           swaggerConfigurator.emit('error', source[CALLINFO]);
         }
       },
+      onRetry(request, error) {
+        if (req.gb?.logger?.warn) {
+          req.gb.logger.warn('Retrying service call', {
+            status: error.status,
+            errno: error.errno,
+          });
+        }
+      },
     };
     const isHttps = protocol.toLowerCase().startsWith('https');
     const finalPort = Number(port || (isHttps ? 8443 : 8000));
