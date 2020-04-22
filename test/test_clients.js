@@ -14,6 +14,7 @@ const client = new Client({ service }, {
     'feature-api': {
       protocol: 'http',
       port: 1234,
+      timeout: 20,
     },
   },
 });
@@ -114,13 +115,26 @@ tap.test('test_clients', async (tester) => {
   tester.test('Timeouts should work', async (t) => {
     nock('http://feature-api:1234')
       .post('/feature/features/timeout', { app: { id: 'GasBuddy' } })
-      .delay({ head: 100 })
+      .delay({ head: 50 })
       .reply(200, {});
 
     const response = await featureApi.getFeatures({
       tag: 'timeout',
       client: fakeRequest,
     }, { timeout: 10 }).catch(e => e);
+    t.strictEquals(response.type, 'aborted', 'Should get an aborted error');
+  });
+
+  tester.test('Timeouts should work from config', async (t) => {
+    nock('http://feature-api:1234')
+      .post('/feature/features/timeoutconfig', { app: { id: 'GasBuddy' } })
+      .delay({ head: 50 })
+      .reply(200, {});
+
+    const response = await featureApi.getFeatures({
+      tag: 'timeoutconfig',
+      client: fakeRequest,
+    }).catch(e => e);
     t.strictEquals(response.type, 'aborted', 'Should get an aborted error');
   });
 });

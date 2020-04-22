@@ -28,11 +28,12 @@ function serviceFactory(swaggerConfigurator, req) {
       err.client = clientClass;
       throw err;
     }
-    const { basePath = '', hostname = serviceName, port, protocol = 'https', noTracing, log, username, password, authToken } = config.endpoints[serviceName] || {};
+    const { basePath = '', hostname = serviceName, port, protocol = 'https', noTracing, timeout, log, username, password, authToken } = config.endpoints[serviceName] || {};
     let newSpanLogger;
     const clientConfig = {
       fetch: config.fetch,
       AbortController: config.AbortController,
+      timeout,
       EventSource,
       FormData,
       requestInterceptor(request, source) {

@@ -17,10 +17,11 @@ export default class FeatureAPI {
       fetch,
       EventSource,
       AbortController,
+      timeout,
       requestInterceptor,
       responseInterceptor,
     } = config || {};
-    Object.assign(this, { baseUrl, fetch, requestInterceptor, responseInterceptor, AbortController, EventSource });
+    Object.assign(this, { baseUrl, fetch, requestInterceptor, responseInterceptor, AbortController, timeout, EventSource });
   }
 
   /**
