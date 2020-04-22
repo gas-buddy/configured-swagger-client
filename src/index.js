@@ -2,6 +2,7 @@ import defaultFetch from 'node-fetch';
 import FormData from 'form-data';
 import EventSource from 'eventsource';
 import { EventEmitter } from 'events';
+import AbortController from 'abort-controller';
 
 const CONFIG_FUNCTION = Symbol.for('small-swagger-codegen::configurationGenerator');
 const CALLINFO = Symbol('Swagger call info key');
@@ -31,6 +32,7 @@ function serviceFactory(swaggerConfigurator, req) {
     let newSpanLogger;
     const clientConfig = {
       fetch: config.fetch,
+      AbortController: config.AbortController,
       EventSource,
       FormData,
       requestInterceptor(request, source) {
@@ -99,6 +101,7 @@ export default class SwaggerClientConfigurator extends EventEmitter {
     super();
     this.config = {
       fetch: defaultFetch,
+      AbortController,
       ...config,
     };
     context.service.on('request', (req) => {

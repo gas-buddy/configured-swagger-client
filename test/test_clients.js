@@ -110,4 +110,17 @@ tap.test('test_clients', async (tester) => {
 
     t.strictEquals(response.status, 200, 'Should get a 200');
   });
+
+  tester.test('Timeouts should work', async (t) => {
+    nock('http://feature-api:1234')
+      .post('/feature/features/timeout', { app: { id: 'GasBuddy' } })
+      .delay({ head: 100 })
+      .reply(200, {});
+
+    const response = await featureApi.getFeatures({
+      tag: 'timeout',
+      client: fakeRequest,
+    }, { timeout: 10 }).catch(e => e);
+    t.strictEquals(response.type, 'aborted', 'Should get an aborted error');
+  });
 });
