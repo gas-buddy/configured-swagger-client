@@ -46,9 +46,15 @@ function serviceFactory(swaggerConfigurator, req) {
         request.headers = request.headers || {};
         if (!noTracing) {
           request.headers.correlationid = req.headers?.correlationid;
-          request.headers['user-agent'] = req.headers?.['user-agent'];
           newSpanLogger = req.gb?.logger?.loggerWithNewSpan?.();
           request.headers.span = newSpanLogger?.spanId;
+
+          const isReplaceableUA = typeof request.headers['user-agent'] === 'string'
+                                  && request.headers['user-agent'].includes('node-fetch');
+
+          if (isReplaceableUA && req.headers?.['user-agent']) {
+            request.headers['user-agent'] = req.headers['user-agent'];
+          }
         }
         if ((log || logEverything) && req.gb?.logger) {
           req.gb.logger.info('api-req', {
