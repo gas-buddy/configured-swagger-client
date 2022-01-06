@@ -48,6 +48,12 @@ function serviceFactory(swaggerConfigurator, req) {
           request.headers.correlationid = req.headers?.correlationid;
           newSpanLogger = req.gb?.logger?.loggerWithNewSpan?.();
           request.headers.span = newSpanLogger?.spanId;
+          const ua = request.headers['user-agent'];
+          const isReplaceableUA = typeof ua === 'string' && ua.includes('node-fetch');
+
+          if (isReplaceableUA && req.headers?.['user-agent']) {
+            request.headers['user-agent'] = req.headers['user-agent'];
+          }
         }
         if ((log || logEverything) && req.gb?.logger) {
           req.gb.logger.info('api-req', {
