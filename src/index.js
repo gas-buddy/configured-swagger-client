@@ -49,7 +49,7 @@ function serviceFactory(swaggerConfigurator, req) {
           newSpanLogger = req.gb?.logger?.loggerWithNewSpan?.();
           request.headers.span = newSpanLogger?.spanId;
           const ua = request.headers['user-agent'];
-          const isReplaceableUA = typeof ua === 'string' && ua.includes('node-fetch');
+          const isReplaceableUA = !ua || (typeof ua === 'string' && ua.includes('node-fetch'));
 
           if (isReplaceableUA && req.headers?.['user-agent']) {
             request.headers['user-agent'] = req.headers['user-agent'];
