@@ -33,7 +33,7 @@ function serviceFactory(swaggerConfigurator, req) {
     const clientConfig = {
       fetch: config.fetch,
       AbortController: config.AbortController,
-      timeout,
+      timeout: timeout || config.defaultTimeout,
       EventSource,
       FormData,
       requestInterceptor(request, source) {
